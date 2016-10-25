@@ -360,7 +360,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (this.hasClass(target, className)) {
 	            return this;
 	        }
-	        target.className = target.className.trim() + ' ' + className;
+	        target.className = (target.className.trim() + ' ' + className).trim();
 	        return this;
 	    };
 
@@ -381,8 +381,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Selector;
 	}();
 
-	exports.default = Selector;
-	module.exports = exports['default'];
+	exports.selectorManager = selectorManager;
+	exports.Selector = Selector;
 
 /***/ }
 /******/ ])

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<title>下拉框组件测试</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>下拉框组件测试</title>
 </head>
 <body>
 
@@ -12,35 +12,37 @@
 
 <div id="mm"></div>
 <div id="ll"></div>
-	<script type="text/javascript" src="./../index.js"></script>
-	<script>
-		'use strict';
-		var selector = new MobileSelector({
-			selected:0,
-			global:true,
-			name:'nnnn',
-			cssTxt:'body{background:blue;}',
-			wrapper:document.querySelector('#menu'),
-			container:document.querySelector('#list'),
-			alias:{text:'name' , value:'id'},
-			list:[{name:'全部',id:'all'},{name:'aaaa',id:'in'},{name:'bbbb',id:'out'}],
-			callback:function(idx , value){
-				console.log(idx , value);
-			}
-		});
+  <script type="text/javascript" src="./../index.js"></script>
+  <script>
+    'use strict';
+    // MobileSelector.selectorManager.removeCommonCss();
+    new MobileSelector.Selector({
+        selected:0,
+        global:true,
+        name:'aaabbb',
+        cssTxt:'body{background:blue;}',
+        wrapper:document.querySelector('#menu'),
+        container:document.querySelector('#list'),
+        alias:{text:'name' , value:'id'},
+        list:[{name:'全部',id:'all'},{name:'aaaa',id:'in'},{name:'bbbb',id:'out'}],
+        callback:function(idx , value){
+            console.log(idx , value);
+        }
+    });
 
-		var selector2 = new MobileSelector({
-			selected:3,
-			wrapper:document.querySelector('#mm'),
-			container:document.querySelector('#ll'),
-			callback:function(idx , value){
-				console.log(idx , value);
-			},
-			showFun:function(){
-			},
-			hideFun:function(){
-			}
-		});
-	</script>
+    new MobileSelector.Selector({
+        selected:3,
+        wrapper:document.querySelector('#mm'),
+        container:document.querySelector('#ll'),
+        callback:function(idx , value){
+            console.log(idx , value);
+        },
+        showFun:function(){
+        },
+        hideFun:function(){
+        }
+    });
+    console.log(MobileSelector);
+  </script>
 </body>
 </html>

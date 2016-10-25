@@ -1,7 +1,49 @@
 # ui-mobile-selector
 针对移动端做的一个select组件。
 
-参数
+## 引入
+
+### exports
+
+```js
+  if(typeof exports === 'object' && typeof module === 'object')
+  	module.exports = factory();
+  else if(typeof define === 'function' && define.amd)
+  	define([], factory);
+  else if(typeof exports === 'object')
+  	exports["MobileSelector"] = factory();
+  else
+  	root["MobileSelector"] = factory();
+```
+
+### import
+
+```js
+  import {Selector , selectorManager} from 'ui-mobile-selector';
+  //或
+  var MobileSelector = require('ui-mobile-selector');
+  new MobileSelector.Selector();
+  MobileSelector.selectorManager;
+```
+or
+```html
+  //or
+  <script type="text/javascript" src="index.js"></script>
+  <script>
+  	 new MobileSelector.Selector();
+  	 MobileSelector.selectorManager;
+  </script>
+```
+
+## MobileSelector
+
+*   `Selector` : `Function` 通过 `new MobileSelector.Selector({})` 或 `new Selector({})`(`import`模式)创建selector实例
+*   `selectorManager` : `Object` 是`SelectorManager`实例，可直接使用。
+
+### Selector
+select的组件。
+
+#### 参数
 
 ```js
 	this.list                    = props.list || [];  		//   列表
@@ -23,33 +65,11 @@
 	this.defaultText             = props.defaultText || '请选择';//没有数据的时候显示
 	this.autoClose               = typeof props.autoClose !== 'undefined' ? !!props.autoClose : true;//是否自动关闭
 	this.global                  = typeof props.global !== 'undefined' ? !!props.global : true;//是否是全局
-	this.loadingTmpl             = props.loadingTmpl || '<div class="ui-mobile-selector-loading-container"><span class="loading"><i class="loading-icon"></i>正在加载数据...</span></div>';//；loading
+	this.loadingTmpl             = props.loadingTmpl || '<div class="ui-mobile-selector-loading-container"><span class="loading"><i class="loading-icon"></i>正在加载数据...</span></div>';// loading
+	props.extends //扩展属性
 ```
 
-例子
-
-```html
-  <div id="menu"></div>
-  <div id="list"></div>
-```
-
-```js
-	var selector = new MobileSelector({
-		selected:0,
-		global:true,
-		name:'nnnn',
-		cssTxt:'body{background:blue;}',
-		wrapper:document.querySelector('#menu'),
-		container:document.querySelector('#list'),
-		alias:{text:'name' , value:'id'},
-		list:[{name:'全部',id:'all'},{name:'aaaa',id:'in'},{name:'bbbb',id:'out'}],
-		callback:function(idx , value){
-			console.log(idx , value);
-		}
-	});
-```
-
-方法
+#### 方法
 
 ```js
   init()  //初始化
@@ -76,4 +96,65 @@
   addClass(target , className)
   removeClass(target , className)
   toggle()
+```
+
+#### 例子
+
+```html
+  <div id="menu"></div>
+  <div id="list"></div>
+```
+
+```js
+	new MobileSelector.Selector({
+		selected:0,
+		global:true,
+		name:'nnnn',
+		cssTxt:'body{background:blue;}',
+		wrapper:document.querySelector('#menu'),
+		container:document.querySelector('#list'),
+		alias:{text:'name' , value:'id'},
+		list:[{name:'全部',id:'all'},{name:'aaaa',id:'in'},{name:'bbbb',id:'out'}],
+		callback:function(idx , value){
+			console.log(idx , value);
+		}
+	});
+```
+
+
+### SelectorManager
+组件管理对象
+
+主要用于添加/删除全局css，管理全部的Selector对象。
+
+为内部组件，可以通过`Selector`实例的`this.selectorManager`访问。
+
+#### 参数
+
+```js
+  this.count       = 0;        //组件数量
+  this.selectors   = {};       //组件集合
+  this.cssTxt      = cssTxt;   //组件通用样式
+  this.doc         = window && window.document;//document
+  this.headWrapper = this.doc && this.doc.head ? this.doc.head : this.doc.getElementsByTagName('head')[0];//head
+  this.cssWrapper  = null;     //css Dom节点
+```
+
+#### 方法
+
+```js
+  appendCssWrapper() //添加css dom
+  addCommonCss(css) //添加默认全局css
+  removeCommonCss() //删除全局css
+  addSelector(selector)//添加Selector实例到SelectorManager
+  removeSelector(selectorName) // 删除Selector实例
+  efficientGlobal(selectorName) // 触发组件显示，并关闭其它组件（只有global:true的组件才会被关闭）。
+  setCount(dir)//添加或删除组件个数
+  getName() //组件没有名称则生成默认规则规则的名称
+```
+
+#### 例子
+
+```js
+  MobileSelector.selectorManager.removeCommonCss();
 ```

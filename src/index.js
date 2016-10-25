@@ -91,7 +91,7 @@ class SelectorManager{
 
 const selectorManager = new SelectorManager();
 
-export default class Selector{
+class Selector{
     constructor(props) {
         if ( ({}).toString.call(props) !== '[object Object]' ) {
             throw new Error('Selector need [object Object].');
@@ -275,7 +275,7 @@ export default class Selector{
         if ( this.hasClass(target,className) ) {
             return this;
         }
-        target.className = target.className.trim()+' '+className;
+        target.className = (target.className.trim()+' '+className).trim();
         return this;
     }
     removeClass(target , className){
@@ -291,3 +291,5 @@ export default class Selector{
         return this.show();
     }
 }
+
+export {selectorManager , Selector};
