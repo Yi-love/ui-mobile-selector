@@ -158,3 +158,11 @@ select的组件。
 ```js
   MobileSelector.selectorManager.removeCommonCss();
 ```
+
+### 修改/测试
+
+cmd:
+
+```
+  webpack
+```
