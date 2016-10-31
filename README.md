@@ -1,6 +1,13 @@
 # ui-mobile-selector
 针对移动端做的一个select组件。
 
+## 日志
+
+```
+  v1.1.0  2016-10-31   添加自定义模版功能。
+  v1.0.2  2016-10-26   发布ui-mobile-selector
+```
+
 ## 引入
 
 ### exports
@@ -41,7 +48,7 @@ or
 *   `selectorManager` : `Object` 是`SelectorManager`实例，可直接使用。
 
 ### Selector
-select的组件。
+select的组件。引入自定义模版时，必须保证每个选项的`data-index`属性存在。
 
 #### 参数
 
@@ -65,6 +72,15 @@ select的组件。
 	this.defaultText             = props.defaultText || '请选择';//没有数据的时候显示
 	this.autoClose               = typeof props.autoClose !== 'undefined' ? !!props.autoClose : true;//是否自动关闭
 	this.global                  = typeof props.global !== 'undefined' ? !!props.global : true;//是否是全局
+  //v1.1.0
+  this.menuTmpl                = props.menuTmpl || '<span class="txt"><%= list.length === 0 ? defaultText : list[selected][alias.text]%></span>';//点击框模版
+  this.listerTmpl              = props.listerTmpl || ['<ul class="selector-lister">',  //列表模版
+                                                      '<%for ( var i = 0 ,len = list.length ; i < len ; i++ ){%>',
+                                                          '<li class='+'"<%=listerClassName+(selected === i ? " "+selectClassName :"")%>"'+' data-value="<%=list[i][alias.value]%>" data-index="<%=i%>">',
+                                                              '<span class="desc"><%=list[i][alias.text]%></span>',
+                                                          '</li>',
+                                                      '<%}%>',
+                                                      '</ul>'].join('');
 	this.loadingTmpl             = props.loadingTmpl || '<div class="ui-mobile-selector-loading-container"><span class="loading"><i class="loading-icon"></i>正在加载数据...</span></div>';// loading
 	props.extends //扩展属性
 ```
@@ -158,6 +174,23 @@ select的组件。
 ```js
   MobileSelector.selectorManager.removeCommonCss();
 ```
+
+### 模版语法
+传入的是`this`对象。
+```
+ <%=%> 取值
+ <%%>  js
+
+  //例如
+ ['<ul class="selector-lister">',  //列表模版
+   '<%for ( var i = 0 ,len = list.length ; i < len ; i++ ){%>',
+       '<li class='+'"<%=listerClassName+(selected === i ? " "+selectClassName :"")%>"'+' data-value="<%=list[i][alias.value]%>" data-index="<%=i%>">',
+           '<span class="desc"><%=list[i][alias.text]%></span>',
+       '</li>',
+   '<%}%>',
+   '</ul>'].join('');
+```
+
 
 ### 修改/测试
 

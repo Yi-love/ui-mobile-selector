@@ -1,5 +1,36 @@
 'use strict';
 
+class Render{
+    escape(html){
+        return String(html)
+                .replace(/&(?!\w+;)/g , '&amp;')
+                .replace(/</g , '&lt;')
+                .replace(/>/g , '&gt;')
+                .replace(/"/g , '&quot;')
+                .replace(/'/g , '&#039;');
+    }
+    complie(str){
+        let tpl = str.replace(/\n/g ,'\\n')
+                    .replace(/<%=([\s\S]+?)%>/g , function(match , code){
+                        return '\' + escape('+code+')+\'';
+                    })
+                    .replace(/<%=([\s\S]+?)%>/g , function(match , code){
+                        return '\' + '+ code +' +\'';
+                    })
+                    .replace(/<%([\s\S]+?)%>/g , function(match , code){
+                        return '\';\n '+ code +'\n tpl+=\'';
+                    })
+                    .replace(/\'\n/g,'\'').replace(/\n\'/gm,'\'');
+        tpl = 'tpl = \'' + tpl + '\';';
+        tpl = tpl.replace(/''/g,'\'\\n\'');
+        tpl = 'var tpl =\'\';\n with(obj){\ntry{'+tpl+'\n}catch(e){console.log(\'Template render error => \' ,e)};\n};\n return tpl;';
+        return new Function('obj' , 'escape' , tpl);
+    }
+    render(str , data){
+        return this.complie(str)(data , this.escape);
+    }
+}
+
 const cssTxt = '.ui-selector-menu-container,.ui-selector-menu-container *,.ui-selector-menu-container *:after,.ui-selector-menu-container *:before,'+
                 '.ui-selector-lister-container,.ui-selector-lister-container *,.ui-selector-lister-container *:after,.ui-selector-lister-container *:before{'+
                 '-webkit-box-sizing:border-box;box-sizing:border-box;background:#fff}.ui-selector-menu-container{width:100%;padding:10px 12px;text-align:center;cursor:pointer}'+
@@ -90,6 +121,7 @@ class SelectorManager{
 }
 
 const selectorManager = new SelectorManager();
+const render = new Render();
 
 class Selector{
     constructor(props) {
@@ -118,7 +150,15 @@ class Selector{
         this.defaultText             = props.defaultText || '请选择';//没有数据的时候显示
         this.autoClose               = typeof props.autoClose !== 'undefined' ? !!props.autoClose : true;//是否自动关闭
         this.global                  = typeof props.global !== 'undefined' ? !!props.global : true;//是否是全局
-        this.loadingTmpl             = props.loadingTmpl || '<div class="ui-mobile-selector-loading-container"><span class="loading"><i class="loading-icon"></i>正在加载数据...</span></div>';//；loading
+        this.menuTmpl                = props.menuTmpl || '<span class="txt"><%= list.length === 0 ? defaultText : list[selected][alias.text]%></span>';//点击框模版
+        this.listerTmpl              = props.listerTmpl || ['<ul class="selector-lister">',  //列表模版
+                                                            '<%for ( var i = 0 ,len = list.length ; i < len ; i++ ){%>',
+                                                                '<li class='+'"<%=listerClassName+(selected === i ? " "+selectClassName :"")%>"'+' data-value="<%=list[i][alias.value]%>" data-index="<%=i%>">',
+                                                                    '<span class="desc"><%=list[i][alias.text]%></span>',
+                                                                '</li>',
+                                                            '<%}%>',
+                                                            '</ul>'].join('');
+        this.loadingTmpl             = props.loadingTmpl || '<div class="ui-mobile-selector-loading-container"><span class="loading"><i class="loading-icon"></i>正在加载数据...</span></div>';//；loading模版
         
         this.extendProps(props.extends).init();
         if ( this.isShow ) { this.show();}
@@ -193,19 +233,19 @@ class Selector{
     }
     runCallBack(){
         if ( this.callback && typeof this.callback === 'function' ) {
-            this.callback(this.selected , this.list.length > 0 ? this.list[this.selected][this.alias.value] : this.defaultText);
+            this.callback(this.list.length > 0 ? this.selected : 0, this.list.length > 0 ? this.list[this.selected][this.alias.value] : this.defaultText);
         }
         return this;
     }
     runShowFun(){
         if ( this.showFun && typeof this.showFun === 'function' ) {
-            this.showFun(this.selected , this.list.length > 0 ? this.list[this.selected][this.alias.value] : this.defaultText);
+            this.showFun(this.list.length > 0 ? this.selected : 0 , this.list.length > 0 ? this.list[this.selected][this.alias.value] : this.defaultText);
         }
         return this;
     }
     runHideFun(){
         if ( this.hideFun && typeof this.hideFun === 'function' ) {
-            this.hideFun(this.selected , this.list.length > 0 ? this.list[this.selected][this.alias.value] : this.defaultText);
+            this.hideFun(this.list.length > 0 ? this.selected : 0 , this.list.length > 0 ? this.list[this.selected][this.alias.value] : this.defaultText);
         }
         return this;
     }
@@ -226,23 +266,24 @@ class Selector{
         return this.renderMenu().renderList();
     }
     renderDefault(){
-        this.wrapper.innerHTML = '<span class="txt">'+this.defaultText+'</span>';
-        this.container.innerHTML = this.loadingTmpl;
+        // this.wrapper.innerHTML = '<span class="txt">'+this.defaultText+'</span>';
+        this.wrapper.innerHTML = render.render(this.menuTmpl , this);
+        this.container.innerHTML = render.render(this.loadingTmpl , this);
         return this;
     }
     renderMenu(){
-        let html = '<span class="txt">'+this.list[this.selected][this.alias.text]+'</span>';
-        this.wrapper.innerHTML = html;
+        // let html = '<span class="txt">'+this.list[this.selected][this.alias.text]+'</span>';
+        this.wrapper.innerHTML = render.render(this.menuTmpl , this);
         return this;
     }
     renderList(){
-        let html = '<ul class="selector-lister">';
-        for ( let i = 0 ,len = this.list.length ; i < len ; i++ ){
-            html += '<li class="'+this.listerClassName+(this.selected === i ? ' '+this.selectClassName : '')+'" data-value="'+this.list[i][this.alias.value]+
-                    '" data-index="'+i+'"><span class="desc">'+this.list[i][this.alias.text]+'</span></li>';
-        }
-        html += '</ul>';
-        this.container.innerHTML = html;
+        // let html = '<ul class="selector-lister">';
+        // for ( let i = 0 ,len = this.list.length ; i < len ; i++ ){
+        //     html += '<li class="'+this.listerClassName+(this.selected === i ? ' '+this.selectClassName : '')+'" data-value="'+this.list[i][this.alias.value]+
+        //             '" data-index="'+i+'"><span class="desc">'+this.list[i][this.alias.text]+'</span></li>';
+        // }
+        // html += '</ul>';
+        this.container.innerHTML = render.render(this.listerTmpl , this);
         return this;
     }
     autoHide(){
