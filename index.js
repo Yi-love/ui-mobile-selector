@@ -198,6 +198,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.showFun = props.showFun; //   显示组件之前的回调
 	        this.hideFun = props.hideFun; //   关闭组件之后的回调
 	        this.selected = props.selected || 0; //默认选择
+	        this.bind = props.bind; //绑定input框
 	        this.alias = props.alias || { text: 'text', value: 'value' }; //需要设置的参数别名
 	        this.selectClassName = props.selectClassName || 'current'; //选中样式
 	        this.listerClassName = props.listerClassName || 'lister-i'; //option的样式
@@ -208,21 +209,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.cssTxt = props.cssTxt || ''; //需要附加的css样式
 	        this.isShow = props.isShow ? true : false; //默认是否显示
 	        this.defaultText = props.defaultText || '请选择'; //没有数据的时候显示
-	        this.autoClose = typeof props.autoClose !== 'undefined' ? !!props.autoClose : true; //是否自动关闭
-	        this.global = typeof props.global !== 'undefined' ? !!props.global : true; //是否是全局
+	        this.autoClose = props.autoClose !== void 0 ? !!props.autoClose : true; //是否自动关闭
+	        this.global = props.global !== void 0 ? !!props.global : true; //是否是全局
 	        this.menuTmpl = props.menuTmpl || '<span class="txt"><%= list.length === 0 ? defaultText : list[selected][alias.text]%></span>'; //点击框模版
 	        this.listerTmpl = props.listerTmpl || ['<ul class="selector-lister">', //列表模版
 	        '<%for ( var i = 0 ,len = list.length ; i < len ; i++ ){%>', '<li class=' + '"<%=listerClassName+(selected === i ? " "+selectClassName :"")%>"' + ' data-value="<%=list[i][alias.value]%>" data-index="<%=i%>">', '<span class="desc"><%=list[i][alias.text]%></span>', '</li>', '<%}%>', '</ul>'].join('');
 	        this.loadingTmpl = props.loadingTmpl || '<div class="ui-mobile-selector-loading-container"><span class="loading"><i class="loading-icon"></i>正在加载数据...</span></div>'; //；loading模版
 
 	        this.extendProps(props.extends).init();
+
 	        if (this.isShow) {
 	            this.show();
 	        }
 	    }
 
 	    Selector.prototype.init = function init() {
-	        return this.addCss().addClass(this.wrapper, this.selectorMenuClassName).addClass(this.container, this.selectorListerClassName).render().addEventListener().addToSelectorManager();
+	        return this.addCss().addClass(this.wrapper, this.selectorMenuClassName).addClass(this.container, this.selectorListerClassName).setEffectiveValue().render().addEventListener().addToSelectorManager();
 	    };
 
 	    Selector.prototype.extendProps = function extendProps(props) {
@@ -249,7 +251,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this;
 	        }
 	        this.list = list;
-	        return this.render();
+	        return this.setEffectiveValue().render();
+	    };
+
+	    Selector.prototype.setEffectiveValue = function setEffectiveValue() {
+	        if (this.list.length > 0 && this.selected >= 0 && this.list.length > this.selected && this.list[this.selected][this.alias.value] !== void 0) {
+	            return this.val(this.list[this.selected][this.alias.value]);
+	        }
+	        return this;
+	    };
+
+	    Selector.prototype.val = function val(value) {
+	        if (value !== void 0) {
+	            if (this.bind) {
+	                this.bind.value = value;
+	            }
+	            return this;
+	        }
+	        if (this.list.length > 0 && this.selected >= 0 && this.selected < this.list.length) {
+	            return this.list[this.selected][this.alias.value];
+	        }
+	        return '';
+	    };
+
+	    Selector.prototype.refVal = function refVal() {
+	        if (this.bind) {
+	            return this.bind.value;
+	        }
+	        return '';
 	    };
 
 	    Selector.prototype.addToSelectorManager = function addToSelectorManager() {
@@ -297,7 +326,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this.autoHide();
 	        }
 	        this.selected = idx;
-	        return this.renderMenu().autoHide().runCallBack();
+	        return this.val(this.list[this.selected][this.alias.value]).renderMenu().autoHide().runCallBack();
 	    };
 
 	    Selector.prototype.runCallBack = function runCallBack() {
@@ -339,25 +368,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    Selector.prototype.renderDefault = function renderDefault() {
-	        // this.wrapper.innerHTML = '<span class="txt">'+this.defaultText+'</span>';
 	        this.wrapper.innerHTML = render.render(this.menuTmpl, this);
 	        this.container.innerHTML = render.render(this.loadingTmpl, this);
 	        return this;
 	    };
 
 	    Selector.prototype.renderMenu = function renderMenu() {
-	        // let html = '<span class="txt">'+this.list[this.selected][this.alias.text]+'</span>';
 	        this.wrapper.innerHTML = render.render(this.menuTmpl, this);
 	        return this;
 	    };
 
 	    Selector.prototype.renderList = function renderList() {
-	        // let html = '<ul class="selector-lister">';
-	        // for ( let i = 0 ,len = this.list.length ; i < len ; i++ ){
-	        //     html += '<li class="'+this.listerClassName+(this.selected === i ? ' '+this.selectClassName : '')+'" data-value="'+this.list[i][this.alias.value]+
-	        //             '" data-index="'+i+'"><span class="desc">'+this.list[i][this.alias.text]+'</span></li>';
-	        // }
-	        // html += '</ul>';
 	        this.container.innerHTML = render.render(this.listerTmpl, this);
 	        return this;
 	    };

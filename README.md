@@ -4,6 +4,7 @@
 ## 日志
 
 ```
+  v1.2.0  2016-11-02   添加input框绑定和val(value)及refVal()函数
   v1.1.0  2016-10-31   添加自定义模版功能。
   v1.0.2  2016-10-26   发布ui-mobile-selector
 ```
@@ -60,6 +61,8 @@ select的组件。引入自定义模版时，必须保证每个选项的`data-in
 	this.showFun                 = props.showFun;     		//   显示组件之前的回调
 	this.hideFun                 = props.hideFun;     		//   关闭组件之后的回调
 	this.selected                = props.selected || 0;   //默认选择
+  //v1.2.0
+  this.bind                    = props.bind;       //绑定input框
 	this.alias                   = props.alias || {text:'text' , value:'value'};//需要设置的参数别名
 	this.selectClassName         = props.selectClassName || 'current';   				//选中样式
 	this.listerClassName         = props.listerClassName || 'lister-i';  				//option的样式
@@ -92,6 +95,8 @@ select的组件。引入自定义模版时，必须保证每个选项的`data-in
   extendProps(props) //扩展属性
   addCss()  //添加css
   setList(list)//设置数据列表
+  val(value) //设置input框value或者获取当前select选中的值
+  refVal()//返回input框当前的值
   addToSelectorManager() //把组件对象添加到组件管理对象
   removeFromSelectorManager()//从管理对象中移除
   efficientGlobal() //作用于全局。比如：一个页面有多个select组件，想打开这个组件的同时关闭其它组件
@@ -119,14 +124,16 @@ select的组件。引入自定义模版时，必须保证每个选项的`data-in
 ```html
   <div id="menu"></div>
   <div id="list"></div>
+  <input type="text" id="yy">
 ```
 
 ```js
-	new MobileSelector.Selector({
+	var select = new MobileSelector.Selector({
 		selected:0,
 		global:true,
 		name:'nnnn',
 		cssTxt:'body{background:blue;}',
+    bind: document.querySelector('#yy'),
 		wrapper:document.querySelector('#menu'),
 		container:document.querySelector('#list'),
 		alias:{text:'name' , value:'id'},
@@ -135,6 +142,7 @@ select的组件。引入自定义模版时，必须保证每个选项的`data-in
 			console.log(idx , value);
 		}
 	});
+  console.log(select.val());
 ```
 
 

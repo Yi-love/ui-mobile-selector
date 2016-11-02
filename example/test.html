@@ -9,18 +9,21 @@
 
 <div id="menu"></div>
 <div id="list"></div>
-
+<input type="text" id="yy">
+<br>
 <div id="mm"></div>
 <div id="ll"></div>
+
   <script type="text/javascript" src="./../index.js"></script>
   <script>
     'use strict';
     // MobileSelector.selectorManager.removeCommonCss();
-    new MobileSelector.Selector({
+    var aa =new MobileSelector.Selector({
         selected:0,
         global:true,
         name:'aaabbb',
         cssTxt:'body{background:blue;}',
+        bind: document.querySelector('#yy'),
         wrapper:document.querySelector('#menu'),
         container:document.querySelector('#list'),
         alias:{text:'name' , value:'id'},
@@ -30,6 +33,7 @@
         }
     });
 
+    console.log(aa.val() , aa.refVal());
     new MobileSelector.Selector({
         selected:3,
         wrapper:document.querySelector('#mm'),
