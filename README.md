@@ -1,6 +1,10 @@
 # ui-mobile-selector
 针对移动端做的一个select组件。
 
+```
+ npm install ui-mobile-selector
+```
+
 ## 日志
 
 ```
