@@ -1,6 +1,6 @@
 {
   "name": "ui-mobile-selector",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "ui-selector mode in mobile ",
   "main": "index.js",
   "scripts": {
